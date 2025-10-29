@@ -2,12 +2,19 @@ version: "3.9"
 
 services:
   app:
-    image: php:8.2-apache
+    # image: php:8.2-apache を build: . に変更します
+    # これにより、同じディレクトリにある Dockerfile を使ってイメージがビルドされます
+    build: .
     container_name: lamp-app
     ports:
       - "80:80"
     volumes:
-      - ./src:/var/www/html
+      # ソースコード (./src) と Apache 設定ファイル (./apache-config.conf) は
+      # ビルド時に Dockerfile によってイメージにコピーされるため、ここからは削除します。
+
+      # ./php-data ボリュームは、コンテナが書き込むデータを永続化するために残します。
+      - ./php-data:/var/www/html/data
+
     depends_on:
       - db
     environment:
@@ -15,6 +22,7 @@ services:
       - MYSQL_USER=user
       - MYSQL_PASSWORD=password
       - MYSQL_DATABASE=testdb
+      - PHP_WRITE_DIR=/var/www/html/data
 
   db:
     image: mysql:8.0
